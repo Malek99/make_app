@@ -4,6 +4,7 @@
 #include<unistd.h>
 #include<dirent.h>
 #include<stdbool.h>
+#include<sys/types.h>
 
 #define MAX 4096
 
@@ -64,7 +65,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    if(geteuid() != 0) // to check for toot permission
+    if(geteuid() != 0) // to check for root permission
     {
         printf("this program requires root permission, try with sudo\n");
         return 2;

@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-#include <unistd.h>
+#include<unistd.h>
 
 #define MAX 4096
 
@@ -19,6 +19,22 @@ void con(char *str, char *added)
 }
 
 
+// to replace the spaces in the file name with dashes - 
+void dash(char *str)
+{
+    if(str[strlen(str) - 1] == ' ') // remove the last character if it is a space
+        str[strlen(str) - 1] = '\0';
+  
+    while(*str)
+    {
+        if(*str == ' ')
+            *str = '-';
+
+        str++;
+    }
+}
+
+
 int main(int argc, char* argv[])
 {
     if(argc != 3)
@@ -33,7 +49,8 @@ int main(int argc, char* argv[])
     con(file_str, "[Desktop Entry]\nType=Application\nEncoding=UTF-8\nName=");
 
     printf("Enter the name of the application:\n");
-    scanf("%s", name);
+    fgets(name, sizeof(name), stdin);
+    name[strlen(name) - 1] = '\0'; // to remove the \n read by fgets
     con(file_str, name);
     
     printf("Do you want to add a comment? (y/n)\n");
@@ -75,7 +92,7 @@ int main(int argc, char* argv[])
         con(file_str, "false\n");
     
    
-
+    dash(name);
     con(name, ".desktop");
     word[0] = '\0';
     con(word, "/usr/share/applications/");

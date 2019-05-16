@@ -2,6 +2,8 @@
 #include<stdlib.h>
 #include<string.h>
 #include<unistd.h>
+#include<dirent.h>
+#include<stdbool.h>
 
 #define MAX 4096
 
@@ -35,12 +37,37 @@ void dash(char *str)
 }
 
 
+// to check if the .desktop file already exists in /usr/share/applications directory or not
+bool file_exist(const char *name)
+{
+    DIR *dir;
+    struct dirent *file;
+
+    dir = opendir("/usr/share/applications");
+
+    while(file = readdir(dir))
+    {
+        if(!strcmp(name, file->d_name))
+            return true;
+    }
+
+    return false;
+}
+
+
+
 int main(int argc, char* argv[])
 {
     if(argc != 3)
     {
-        printf("Usage: ./make_app <Executable file> <Icon>\n");
+        printf("Usage: ./make_app <Executable file> <Icon>\nnote that this program requires root permission to make a .desktop file into /usr/share/applications/ directory\n");
         return 1;
+    }
+
+    if(geteuid() != 0) // to check for toot permission
+    {
+        printf("this program requires root permission, try with sudo\n");
+        return 2;
     }
 
     char file_str[MAX], word[200], name[200];
@@ -54,9 +81,8 @@ int main(int argc, char* argv[])
     con(file_str, name);
     
     printf("Do you want to add a comment? (y/n)\n");
-    scanf("%s", word);
+    fgets(word, sizeof(word), stdin);
 
-    getc(stdin); // just to trem the \n to prevent the next gets from reading it
     if(word[0] == 'y' || word[0] == 'Y')
     {
         con(file_str, "\nComment=");
@@ -65,7 +91,7 @@ int main(int argc, char* argv[])
         con(file_str, word);
     }
 
-    con(file_str, "\nExec=");
+    con(file_str, "Exec=");
 
     if(argv[1][0] != '/') // to check if the path doesn't start from root directory
     {
@@ -85,7 +111,7 @@ int main(int argc, char* argv[])
 
     con(file_str, "\nTerminal=");
     printf("Is it a terminal application? (y/n)\n");
-    scanf("%s", word);
+    fgets(word, sizeof(word), stdin);
     if(word[0] == 'y' || word[0] == 'Y')
         con(file_str, "true\n");
     else 
@@ -97,12 +123,22 @@ int main(int argc, char* argv[])
     word[0] = '\0';
     con(word, "/usr/share/applications/");
     con(word, name);
+
+    if(file_exist(name))
+    {
+        printf("the file %s already exists, do you want to replace it? (y/n)\n", word);
+
+        char op = getc(stdin);
+        if(op != 'y' && op != 'Y')
+            return 3;
+    }
+    
     FILE *desktop = fopen(word, "w"); // requires root permission
 
     if(!desktop)
     {
-        printf("could not open %s, try with sudo\n", word);
-        return 3;
+        printf("could not open %s\n", word);
+        return 4;
     }
     
     fputs(file_str, desktop);

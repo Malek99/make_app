@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
         con(file_str, word);
     }
 
-    con(file_str, "Exec=");
+    con(file_str, "\nExec=");
 
     if(argv[1][0] != '/') // to check if the path doesn't start from root directory
     {

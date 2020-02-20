@@ -45,5 +45,5 @@ To use this program download the file make_app.c and do the following:
 
 6- next, you should state if you want to add a comment, this comment usually is shown in the tooltip or under the name of the application
 
-7- it will ask you if the program is a terminal application, usually the answer is no
+7- it will ask you if the program is a terminal application, usually the answer is no.
   
